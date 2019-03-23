@@ -1,0 +1,23 @@
+{
+  "name": "part-3",
+  "version": "1.0.0",
+  "description": "Web and mobile programming Spring 2019 University course exercise",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/argituri/full-stack-2018.git"
+  },
+  "author": "Artturi Suominen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/argituri/full-stack-2018/issues"
+  },
+  "homepage": "https://github.com/argituri/full-stack-2018#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
