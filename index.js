@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 
+app.use(bodyParser.json());
+
 let contacts = [
   {
   	name: "Arto Hellas",
@@ -22,13 +24,24 @@ let contacts = [
   	name: "Lea Kutvonen",
   	number: "040-123456",
   	id: 4,
-  },
-  {
-  	name: "Meeri Elfving",
-  	number: "040-123456",
-  	id: 4,
   }
 ]
+
+function addContact(contact){
+	console.log("Adding contact : " + contact.name + " : " + contact.number)
+	contacts.push(
+	{
+		name: contact.name,
+		number: contact.number,
+		id: newId()
+	}
+	)
+	console.log("Pushed to contacts")
+}
+
+function newId(){
+	return Math.floor(Math.random() * Math.floor(1000));
+}
 
 app.get('/api/persons/:id', (request, response) => {
 	const id = Number(request.params.id)
@@ -53,11 +66,16 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 
-app.post('/api/personsPost', (request, response) => {
+app.post('/api/persons', (request, response) => {
   const contact = request.body
   console.log(contact)
-
-  response.json(contact)
+  if (!contact.name || !contact.number) {
+  	response.status(400).send("Name or Number not found").end()
+  } else {
+  	addContact(contact)
+  	console.log("Added contact")
+  	response.status(204).end()
+  }
 })
 
 app.get('/api/persons', (request, response) => {
