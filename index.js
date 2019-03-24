@@ -1,8 +1,11 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const cors = require('cors')
 
-app.use(bodyParser.json());
+
+app.use(bodyParser.json())
+app.use(cors())
 
 let contacts = [
   {
@@ -28,15 +31,22 @@ let contacts = [
 ]
 
 function addContact(contact){
-	console.log("Adding contact : " + contact.name + " : " + contact.number)
-	contacts.push(
-	{
-		name: contact.name,
-		number: contact.number,
-		id: newId()
+	if (contacts.filter((existingContact) => (existingContact.name === contact.name)).length > 0) {
+		console.log("Contact already in db")
+		return false;
+	} else {
+		console.log("Adding contact : " + contact.name + " : " + contact.number)
+		contacts.push(
+		{
+			name: contact.name,
+			number: contact.number,
+			id: newId()
+		}
+		)
+		console.log("Pushed to contacts")
+		return true
 	}
-	)
-	console.log("Pushed to contacts")
+
 }
 
 function newId(){
@@ -60,9 +70,15 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
+  const prevLength = contacts.length
   contacts = contacts.filter(contact => contact.id !== id)
+  if (prevLength === contacts.length) {
+  	response.status(400).send("Unable to delete record with id " + id).end()
+  } else {
+    response.status(204).end()	
+  }
 
-  response.status(204).end()
+  
 })
 
 
@@ -72,9 +88,14 @@ app.post('/api/persons', (request, response) => {
   if (!contact.name || !contact.number) {
   	response.status(400).send("Name or Number not found").end()
   } else {
-  	addContact(contact)
-  	console.log("Added contact")
-  	response.status(204).end()
+  	if (addContact(contact)) {
+  		console.log("Added contact")
+  		response.status(204).end()
+  	} else {
+  		console.log("Contact name already found")
+  		response.status(400).send("Contact with same name exists!").end()
+  	}
+
   }
 })
 
@@ -83,7 +104,7 @@ app.get('/api/persons', (request, response) => {
 	response.json(contacts)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
